@@ -1,3 +1,4 @@
 {
+  "/api/generateDiet/route": "app/api/generateDiet/route.js",
   "/page": "app/page.js"
 }
