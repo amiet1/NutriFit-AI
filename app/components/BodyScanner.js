@@ -4,6 +4,10 @@ import React, { useRef, useEffect, useState } from "react";
 import * as bodyPix from "@tensorflow-models/body-pix";
 import "@tensorflow/tfjs";
 
+// Suppress TensorFlow console spam
+import * as tf from "@tensorflow/tfjs";
+tf.setBackend("cpu");
+
 const BodyScanner = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -49,21 +53,38 @@ const BodyScanner = () => {
 
   // Generate diet plan
   const generateDiet = async () => {
-    if (!metrics) return;
+    if (!metrics || !metrics.shoulders) {
+      setDietPlan("Please scan your body first to get measurements");
+      return;
+    }
+
     setLoading(true);
+    setDietPlan(""); // Clear previous results
+
     try {
+      console.log("Sending metrics:", metrics);
       const response = await fetch("/api/generateDiet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ metrics }),
       });
+
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+
       const data = await response.json();
+      console.log("Diet plan response:", data);
       setDietPlan(data.dietPlan || "No diet plan returned");
     } catch (err) {
-      console.error(err);
-      setDietPlan("Error generating diet plan");
+      console.error("Diet generation error:", err);
+      setDietPlan(`Error generating diet plan: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Helper: calculate body widths at key heights
@@ -96,9 +117,15 @@ const BodyScanner = () => {
 
   // Segment and draw body safely
   useEffect(() => {
+    if (!model) return;
+
     let animationFrameId;
+    let isProcessing = false;
+    let isMounted = true;
 
     const segmentBody = async () => {
+      if (!isMounted || isProcessing) return;
+
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const ctx = canvas?.getContext("2d");
@@ -110,39 +137,57 @@ const BodyScanner = () => {
         video.videoWidth === 0 ||
         video.videoHeight === 0
       ) {
-        animationFrameId = requestAnimationFrame(segmentBody);
+        if (isMounted) {
+          animationFrameId = requestAnimationFrame(segmentBody);
+        }
         return;
       }
 
-      // Optionally scale down video to avoid huge textures
-      const scale = 0.5;
-      const width = video.videoWidth * scale;
-      const height = video.videoHeight * scale;
-      canvas.width = width;
-      canvas.height = height;
+      isProcessing = true;
 
-      const segmentation = await model.segmentPerson(video, {
-        flipHorizontal: true,
-        internalResolution: "medium",
-        segmentationThreshold: 0.7,
-      });
+      try {
+        // Optionally scale down video to avoid huge textures
+        const scale = 0.5;
+        const width = video.videoWidth * scale;
+        const height = video.videoHeight * scale;
+        canvas.width = width;
+        canvas.height = height;
 
-      const mask = bodyPix.toMask(
-        segmentation,
-        { r: 0, g: 0, b: 0, a: 255 },
-        { r: 0, g: 255, b: 0, a: 0 }
-      );
-      ctx.putImageData(mask, 0, 0);
+        const segmentation = await model.segmentPerson(video, {
+          flipHorizontal: true,
+          internalResolution: "medium",
+          segmentationThreshold: 0.7,
+        });
 
-      const newMetrics = calculateBodyMetrics(segmentation, width, height);
-      setMetrics(newMetrics);
+        if (!isMounted) return;
 
-      animationFrameId = requestAnimationFrame(segmentBody);
+        const mask = bodyPix.toMask(
+          segmentation,
+          { r: 0, g: 0, b: 0, a: 255 },
+          { r: 0, g: 255, b: 0, a: 0 }
+        );
+        ctx.putImageData(mask, 0, 0);
+
+        const newMetrics = calculateBodyMetrics(segmentation, width, height);
+        setMetrics(newMetrics);
+      } catch (error) {
+        console.error("Error in body segmentation:", error);
+      } finally {
+        isProcessing = false;
+        if (isMounted) {
+          animationFrameId = requestAnimationFrame(segmentBody);
+        }
+      }
     };
 
-    if (model) segmentBody();
+    segmentBody();
 
-    return () => cancelAnimationFrame(animationFrameId);
+    return () => {
+      isMounted = false;
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [model]);
 
   return (
@@ -159,6 +204,15 @@ const BodyScanner = () => {
         }}
         autoPlay
         playsInline
+      />
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: "100%",
+          height: "400px",
+          border: "2px solid #ccc",
+          borderRadius: "8px",
+        }}
       />
 
       {/* Body Metrics */}

@@ -1,20 +1,24 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Make sure you have this in your .env
-});
+const openai = new OpenAI();
 
 export async function POST(req) {
   try {
+    console.log("=== DIET GENERATION API CALLED ===");
+
     const body = await req.json();
+    console.log("Received body:", body);
     const { metrics } = body;
 
     if (!metrics) {
+      console.error("No metrics provided in request body");
       return new Response(JSON.stringify({ error: "Metrics not provided" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    console.log("Metrics received:", metrics);
 
     // Construct prompt for AI
     const prompt = `
@@ -31,6 +35,7 @@ Make it concise, practical, and healthy.
 `;
 
     // Call OpenAI
+    console.log("Calling OpenAI API...");
     const response = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -41,18 +46,30 @@ Make it concise, practical, and healthy.
       max_tokens: 500,
     });
 
+    console.log("OpenAI response received");
     const dietPlan =
       response.choices[0]?.message?.content || "No diet plan returned";
 
+    console.log("Returning diet plan:", dietPlan.substring(0, 100) + "...");
     return new Response(JSON.stringify({ dietPlan }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error(err);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    console.error("=== DIET GENERATION ERROR ===");
+    console.error("Error type:", err.constructor.name);
+    console.error("Error message:", err.message);
+    console.error("Full error:", err);
+
+    return new Response(
+      JSON.stringify({
+        error: err.message,
+        details: err.toString(),
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }
