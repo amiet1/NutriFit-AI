@@ -78,7 +78,14 @@ const BodyScanner = () => {
 
       const data = await response.json();
       console.log("Diet plan response:", data);
-      setDietPlan(data.dietPlan || "No diet plan returned");
+      
+      if (data.dietPlan) {
+        setDietPlan(data.dietPlan);
+        console.log("Diet plan set successfully:", data.dietPlan.substring(0, 100));
+      } else {
+        setDietPlan("No diet plan returned from server");
+        console.log("No diet plan in response:", data);
+      }
     } catch (err) {
       console.error("Diet generation error:", err);
       setDietPlan(`Error generating diet plan: ${err.message}`);
@@ -161,11 +168,17 @@ const BodyScanner = () => {
 
         if (!isMounted) return;
 
+        // Create a colored mask for better visibility
         const mask = bodyPix.toMask(
           segmentation,
-          { r: 0, g: 0, b: 0, a: 255 },
-          { r: 0, g: 255, b: 0, a: 0 }
+          { r: 0, g: 0, b: 0, a: 255 }, // Background: black
+          { r: 0, g: 255, b: 0, a: 255 } // Body: bright green
         );
+        
+        // Clear canvas first
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw the mask
         ctx.putImageData(mask, 0, 0);
 
         const newMetrics = calculateBodyMetrics(segmentation, width, height);
@@ -212,6 +225,7 @@ const BodyScanner = () => {
           height: "400px",
           border: "2px solid #ccc",
           borderRadius: "8px",
+          backgroundColor: "#f0f0f0",
         }}
       />
 
@@ -238,8 +252,11 @@ const BodyScanner = () => {
         </button>
 
         {dietPlan && (
-          <div className="mt-4 p-4 border rounded bg-gray-50 text-left whitespace-pre-line">
-            {dietPlan}
+          <div className="mt-4 p-6 border rounded-lg bg-white/80 backdrop-blur-sm text-left whitespace-pre-line shadow-lg">
+            <h3 className="text-xl font-bold text-indigo-900 mb-3">🍎 Your Personalized Diet Plan</h3>
+            <div className="text-gray-800 leading-relaxed">
+              {dietPlan}
+            </div>
           </div>
         )}
       </div>
