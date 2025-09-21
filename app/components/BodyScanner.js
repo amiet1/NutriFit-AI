@@ -13,6 +13,8 @@ const BodyScanner = () => {
   const canvasRef = useRef(null);
   const [model, setModel] = useState(null);
   const [metrics, setMetrics] = useState({});
+  const [capturedMetrics, setCapturedMetrics] = useState(null); // Saved measurements
+  const [isCaptured, setIsCaptured] = useState(false); // Whether measurements are captured
   const [dietPlan, setDietPlan] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -51,10 +53,29 @@ const BodyScanner = () => {
     startVideo();
   }, []);
 
+  // Capture current measurements
+  const captureMeasurements = () => {
+    if (metrics && metrics.shoulders && metrics.chest && metrics.waist && metrics.hips) {
+      setCapturedMetrics({ ...metrics });
+      setIsCaptured(true);
+      console.log("Measurements captured:", metrics);
+    }
+  };
+
+  // Reset captured measurements
+  const resetMeasurements = () => {
+    setCapturedMetrics(null);
+    setIsCaptured(false);
+    setDietPlan("");
+    console.log("Measurements reset");
+  };
+
   // Generate diet plan
   const generateDiet = async () => {
-    if (!metrics || !metrics.shoulders) {
-      setDietPlan("Please scan your body first to get measurements");
+    const metricsToUse = isCaptured ? capturedMetrics : metrics;
+    
+    if (!metricsToUse || !metricsToUse.shoulders) {
+      setDietPlan("Please capture your body measurements first");
       return;
     }
 
@@ -62,11 +83,11 @@ const BodyScanner = () => {
     setDietPlan(""); // Clear previous results
 
     try {
-      console.log("Sending metrics:", metrics);
+      console.log("Sending metrics:", metricsToUse);
       const response = await fetch("/api/generateDiet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ metrics }),
+        body: JSON.stringify({ metrics: metricsToUse }),
       });
 
       console.log("Response status:", response.status);
@@ -217,9 +238,10 @@ const BodyScanner = () => {
   }, [model]);
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-      {/* Modern Scanner Interface */}
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl border border-gray-200">
+    <div className="w-full max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left side - Scanner */}
+        <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl border border-gray-200">
         <div className="text-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             📏 Body Scanner
@@ -231,7 +253,7 @@ const BodyScanner = () => {
 
         {/* Camera Preview */}
         <div className="relative mb-6">
-          <div className="aspect-video bg-gray-100 rounded-2xl overflow-hidden border-4 border-gray-200 relative">
+          <div className="aspect-[4/3] bg-gray-100 rounded-2xl overflow-hidden border-4 border-gray-200 relative">
             <video
               ref={videoRef}
               className="w-full h-full object-cover"
@@ -271,79 +293,129 @@ const BodyScanner = () => {
 
         {/* Real-time Metrics Display */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
+          <div className={`rounded-xl p-4 shadow-sm border ${isCaptured ? 'bg-green-50 border-green-200' : 'bg-white'}`}>
             <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-600">
-                {metrics.shoulders || 0}
+              <div className={`text-2xl font-bold ${isCaptured ? 'text-green-600' : 'text-indigo-600'}`}>
+                {isCaptured ? capturedMetrics?.shoulders || 0 : metrics.shoulders || 0}
               </div>
               <div className="text-sm text-gray-600">Shoulders (px)</div>
+              {isCaptured && <div className="text-xs text-green-600 mt-1">✓ Captured</div>}
             </div>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
+          <div className={`rounded-xl p-4 shadow-sm border ${isCaptured ? 'bg-green-50 border-green-200' : 'bg-white'}`}>
             <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-600">
-                {metrics.chest || 0}
+              <div className={`text-2xl font-bold ${isCaptured ? 'text-green-600' : 'text-indigo-600'}`}>
+                {isCaptured ? capturedMetrics?.chest || 0 : metrics.chest || 0}
               </div>
               <div className="text-sm text-gray-600">Chest (px)</div>
+              {isCaptured && <div className="text-xs text-green-600 mt-1">✓ Captured</div>}
             </div>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
+          <div className={`rounded-xl p-4 shadow-sm border ${isCaptured ? 'bg-green-50 border-green-200' : 'bg-white'}`}>
             <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-600">
-                {metrics.waist || 0}
+              <div className={`text-2xl font-bold ${isCaptured ? 'text-green-600' : 'text-indigo-600'}`}>
+                {isCaptured ? capturedMetrics?.waist || 0 : metrics.waist || 0}
               </div>
               <div className="text-sm text-gray-600">Waist (px)</div>
+              {isCaptured && <div className="text-xs text-green-600 mt-1">✓ Captured</div>}
             </div>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm border">
+          <div className={`rounded-xl p-4 shadow-sm border ${isCaptured ? 'bg-green-50 border-green-200' : 'bg-white'}`}>
             <div className="text-center">
-              <div className="text-2xl font-bold text-indigo-600">
-                {metrics.hips || 0}
+              <div className={`text-2xl font-bold ${isCaptured ? 'text-green-600' : 'text-indigo-600'}`}>
+                {isCaptured ? capturedMetrics?.hips || 0 : metrics.hips || 0}
               </div>
               <div className="text-sm text-gray-600">Hips (px)</div>
+              {isCaptured && <div className="text-xs text-green-600 mt-1">✓ Captured</div>}
             </div>
           </div>
         </div>
 
         {/* Body Ratios */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+          <div className={`rounded-xl p-4 border ${isCaptured ? 'bg-green-50 border-green-200' : 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200'}`}>
             <div className="text-center">
-              <div className="text-xl font-bold text-blue-700">
-                {metrics.waistToShoulderRatio?.toFixed(2) || "0.00"}
+              <div className={`text-xl font-bold ${isCaptured ? 'text-green-700' : 'text-blue-700'}`}>
+                {isCaptured ? capturedMetrics?.waistToShoulderRatio?.toFixed(2) || "0.00" : metrics.waistToShoulderRatio?.toFixed(2) || "0.00"}
               </div>
               <div className="text-sm text-blue-600">Waist/Shoulder Ratio</div>
             </div>
           </div>
-          <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+          <div className={`rounded-xl p-4 border ${isCaptured ? 'bg-green-50 border-green-200' : 'bg-gradient-to-r from-purple-50 to-purple-100 border-purple-200'}`}>
             <div className="text-center">
-              <div className="text-xl font-bold text-purple-700">
-                {metrics.hipToWaistRatio?.toFixed(2) || "0.00"}
+              <div className={`text-xl font-bold ${isCaptured ? 'text-green-700' : 'text-purple-700'}`}>
+                {isCaptured ? capturedMetrics?.hipToWaistRatio?.toFixed(2) || "0.00" : metrics.hipToWaistRatio?.toFixed(2) || "0.00"}
               </div>
               <div className="text-sm text-purple-600">Hip/Waist Ratio</div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Generate Diet */}
-      <div className="mt-4 text-center">
-        <button
-          onClick={generateDiet}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          disabled={loading}
-        >
-          {loading ? "Generating..." : "Generate Diet Plan"}
-        </button>
+        {/* Capture and Reset Buttons */}
+        <div className="flex gap-4 mb-6">
+          <button
+            onClick={captureMeasurements}
+            disabled={!metrics.shoulders || isCaptured}
+            className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all ${
+              !metrics.shoulders || isCaptured
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-500 text-white hover:bg-blue-600 shadow-lg hover:shadow-xl'
+            }`}
+          >
+            {isCaptured ? '✓ Measurements Captured' : '📸 Capture Measurements'}
+          </button>
+          <button
+            onClick={resetMeasurements}
+            disabled={!isCaptured}
+            className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all ${
+              !isCaptured
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-red-500 text-white hover:bg-red-600 shadow-lg hover:shadow-xl'
+            }`}
+          >
+            🔄 Reset
+          </button>
+        </div>
 
-        {dietPlan && (
-          <div className="mt-4 p-6 border rounded-lg bg-white/80 backdrop-blur-sm text-left whitespace-pre-line shadow-lg">
-            <h3 className="text-xl font-bold text-indigo-900 mb-3">
-              🍎 Your Personalized Diet Plan
-            </h3>
-            <div className="text-gray-800 leading-relaxed">{dietPlan}</div>
+        {/* Generate Diet Button */}
+        <div className="text-center">
+          <button
+            onClick={generateDiet}
+            disabled={loading || !isCaptured}
+            className={`w-full py-3 px-6 rounded-xl font-medium transition-all ${
+              loading || !isCaptured
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-green-500 text-white hover:bg-green-600 shadow-lg hover:shadow-xl'
+            }`}
+          >
+            {loading ? "🔄 Generating..." : isCaptured ? "🍎 Generate Diet Plan" : "Capture measurements first"}
+          </button>
+        </div>
+        </div>
+
+        {/* Right side - Diet Plan */}
+        <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl border border-gray-200">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              🍎 Diet Plan
+            </h2>
+            <p className="text-gray-600">Your personalized nutrition plan</p>
           </div>
-        )}
+
+          {dietPlan ? (
+            <div className="bg-white rounded-2xl p-6 shadow-lg border text-left whitespace-pre-line max-h-96 overflow-y-auto">
+              <div className="text-gray-800 leading-relaxed">
+                {dietPlan}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-gray-100 rounded-2xl p-8 text-center">
+              <div className="text-gray-500 text-lg">
+                {isCaptured ? "Click 'Generate Diet Plan' to create your personalized meal plan" : "Capture your body measurements first to generate a diet plan"}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
