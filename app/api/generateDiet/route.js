@@ -22,16 +22,25 @@ export async function POST(req) {
 
     // Construct prompt for AI
     const prompt = `
-You are a nutritionist AI. Create a personalized weight-loss diet plan for a person with the following body metrics:
+You are a professional nutritionist AI. Create a personalized diet plan based on these body scan measurements:
+
+Body Measurements:
 - Shoulders: ${metrics.shoulders}px
-- Chest: ${metrics.chest}px
+- Chest: ${metrics.chest}px  
 - Waist: ${metrics.waist}px
 - Hips: ${metrics.hips}px
 - Waist/Shoulder Ratio: ${metrics.waistToShoulderRatio?.toFixed(2)}
 - Hip/Waist Ratio: ${metrics.hipToWaistRatio?.toFixed(2)}
 
-Provide a full-day diet plan (breakfast, lunch, dinner, snacks) with estimated calories.
-Make it concise, practical, and healthy.
+Based on these measurements, create a comprehensive 7-day meal plan that includes:
+1. Daily calorie target (1500-1800 calories for healthy weight loss)
+2. Breakfast, lunch, dinner, and 2 snacks per day
+3. Specific portion sizes
+4. Macronutrient breakdown (protein, carbs, fats)
+5. Hydration goals
+6. Meal timing recommendations
+
+Make it practical, healthy, and sustainable. Include specific foods with exact measurements.
 `;
 
     // Call OpenAI

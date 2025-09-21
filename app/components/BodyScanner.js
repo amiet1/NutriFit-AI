@@ -78,10 +78,13 @@ const BodyScanner = () => {
 
       const data = await response.json();
       console.log("Diet plan response:", data);
-      
+
       if (data.dietPlan) {
         setDietPlan(data.dietPlan);
-        console.log("Diet plan set successfully:", data.dietPlan.substring(0, 100));
+        console.log(
+          "Diet plan set successfully:",
+          data.dietPlan.substring(0, 100)
+        );
       } else {
         setDietPlan("No diet plan returned from server");
         console.log("No diet plan in response:", data);
@@ -94,31 +97,52 @@ const BodyScanner = () => {
     }
   };
 
-  // Helper: calculate body widths at key heights
+  // Helper: calculate body widths at key heights with improved accuracy
   const calculateBodyMetrics = (segmentation, width, height) => {
     const data = segmentation.data;
     const result = {};
-    const rows = [0.2, 0.4, 0.6, 0.8]; // shoulders, chest, waist, hips
+    // Better body measurement positions
+    const rows = [0.15, 0.25, 0.45, 0.65]; // shoulders, chest, waist, hips
 
     rows.forEach((rowPct, i) => {
       const y = Math.floor(height * rowPct);
       let left = width,
         right = 0;
-      for (let x = 0; x < width; x++) {
-        if (data[y * width + x] === 1) {
-          left = Math.min(left, x);
-          right = Math.max(right, x);
+      let validPixels = 0;
+
+      // Scan multiple rows for better accuracy
+      for (let dy = -3; dy <= 3; dy++) {
+        const scanY = Math.floor(y + dy);
+        if (scanY < 0 || scanY >= height) continue;
+
+        for (let x = 0; x < width; x++) {
+          if (data[scanY * width + x] === 1) {
+            left = Math.min(left, x);
+            right = Math.max(right, x);
+            validPixels++;
+          }
         }
       }
-      const pixelWidth = right - left;
-      if (i === 0) result.shoulders = pixelWidth;
-      else if (i === 1) result.chest = pixelWidth;
-      else if (i === 2) result.waist = pixelWidth;
-      else if (i === 3) result.hips = pixelWidth;
+
+      const pixelWidth = Math.max(0, right - left);
+
+      // Only set measurement if we have enough valid pixels
+      if (validPixels > 15) {
+        if (i === 0) result.shoulders = pixelWidth;
+        else if (i === 1) result.chest = pixelWidth;
+        else if (i === 2) result.waist = pixelWidth;
+        else if (i === 3) result.hips = pixelWidth;
+      }
     });
 
-    result.waistToShoulderRatio = result.waist / result.shoulders || 0;
-    result.hipToWaistRatio = result.hips / result.waist || 0;
+    // Calculate ratios only with valid measurements
+    if (result.shoulders && result.waist && result.shoulders > 0) {
+      result.waistToShoulderRatio = result.waist / result.shoulders;
+    }
+    if (result.hips && result.waist && result.waist > 0) {
+      result.hipToWaistRatio = result.hips / result.waist;
+    }
+
     return result;
   };
 
@@ -162,24 +186,13 @@ const BodyScanner = () => {
 
         const segmentation = await model.segmentPerson(video, {
           flipHorizontal: true,
-          internalResolution: "medium",
-          segmentationThreshold: 0.7,
+          internalResolution: "high", // Higher resolution for better accuracy
+          segmentationThreshold: 0.5, // Lower threshold for better detection
         });
 
         if (!isMounted) return;
 
-        // Create a colored mask for better visibility
-        const mask = bodyPix.toMask(
-          segmentation,
-          { r: 0, g: 0, b: 0, a: 255 }, // Background: black
-          { r: 0, g: 255, b: 0, a: 255 } // Body: bright green
-        );
-        
-        // Clear canvas first
-        ctx.clearRect(0, 0, width, height);
-        
-        // Draw the mask
-        ctx.putImageData(mask, 0, 0);
+        // No visual mask needed - just process measurements
 
         const newMetrics = calculateBodyMetrics(segmentation, width, height);
         setMetrics(newMetrics);
@@ -204,41 +217,113 @@ const BodyScanner = () => {
   }, [model]);
 
   return (
-    <div className="relative w-full max-w-md mx-auto">
-      <video
-        ref={videoRef}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "1px",
-          height: "1px",
-          opacity: 0,
-        }}
-        autoPlay
-        playsInline
-      />
-      <canvas
-        ref={canvasRef}
-        style={{
-          width: "100%",
-          height: "400px",
-          border: "2px solid #ccc",
-          borderRadius: "8px",
-          backgroundColor: "#f0f0f0",
-        }}
-      />
+    <div className="w-full max-w-lg mx-auto">
+      {/* Modern Scanner Interface */}
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl border border-gray-200">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            📏 Body Scanner
+          </h2>
+          <p className="text-gray-600">
+            Position yourself in the frame for accurate measurements
+          </p>
+        </div>
 
-      {/* Body Metrics */}
-      <div className="text-center mt-2">
-        <p>Shoulders: {metrics.shoulders || 0}px</p>
-        <p>Chest: {metrics.chest || 0}px</p>
-        <p>Waist: {metrics.waist || 0}px</p>
-        <p>Hips: {metrics.hips || 0}px</p>
-        <p>
-          Waist/Shoulder Ratio: {metrics.waistToShoulderRatio?.toFixed(2) || 0}
-        </p>
-        <p>Hip/Waist Ratio: {metrics.hipToWaistRatio?.toFixed(2) || 0}</p>
+        {/* Camera Preview */}
+        <div className="relative mb-6">
+          <div className="aspect-video bg-gray-100 rounded-2xl overflow-hidden border-4 border-gray-200 relative">
+            <video
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              autoPlay
+              playsInline
+              muted
+            />
+            {/* Overlay Grid for Alignment */}
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="w-full h-full border-2 border-white/30 rounded-xl">
+                {/* Center crosshair */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                  <div className="w-8 h-8 border-2 border-white/50 rounded-full"></div>
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white/70 rounded-full"></div>
+                </div>
+                {/* Guide lines */}
+                <div className="absolute top-1/4 left-0 right-0 h-px bg-white/30"></div>
+                <div className="absolute top-3/4 left-0 right-0 h-px bg-white/30"></div>
+                <div className="absolute top-0 bottom-0 left-1/4 w-px bg-white/30"></div>
+                <div className="absolute top-0 bottom-0 right-1/4 w-px bg-white/30"></div>
+              </div>
+            </div>
+
+            {/* Status Indicator */}
+            <div className="absolute top-4 right-4">
+              <div
+                className={`w-3 h-3 rounded-full ${
+                  model ? "bg-green-400" : "bg-yellow-400"
+                } shadow-lg`}
+              ></div>
+            </div>
+          </div>
+
+          {/* Hidden canvas for processing */}
+          <canvas ref={canvasRef} style={{ display: "none" }} />
+        </div>
+
+        {/* Real-time Metrics Display */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-white rounded-xl p-4 shadow-sm border">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-indigo-600">
+                {metrics.shoulders || 0}
+              </div>
+              <div className="text-sm text-gray-600">Shoulders (px)</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm border">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-indigo-600">
+                {metrics.chest || 0}
+              </div>
+              <div className="text-sm text-gray-600">Chest (px)</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm border">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-indigo-600">
+                {metrics.waist || 0}
+              </div>
+              <div className="text-sm text-gray-600">Waist (px)</div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm border">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-indigo-600">
+                {metrics.hips || 0}
+              </div>
+              <div className="text-sm text-gray-600">Hips (px)</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Body Ratios */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+            <div className="text-center">
+              <div className="text-xl font-bold text-blue-700">
+                {metrics.waistToShoulderRatio?.toFixed(2) || "0.00"}
+              </div>
+              <div className="text-sm text-blue-600">Waist/Shoulder Ratio</div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+            <div className="text-center">
+              <div className="text-xl font-bold text-purple-700">
+                {metrics.hipToWaistRatio?.toFixed(2) || "0.00"}
+              </div>
+              <div className="text-sm text-purple-600">Hip/Waist Ratio</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Generate Diet */}
@@ -253,10 +338,10 @@ const BodyScanner = () => {
 
         {dietPlan && (
           <div className="mt-4 p-6 border rounded-lg bg-white/80 backdrop-blur-sm text-left whitespace-pre-line shadow-lg">
-            <h3 className="text-xl font-bold text-indigo-900 mb-3">🍎 Your Personalized Diet Plan</h3>
-            <div className="text-gray-800 leading-relaxed">
-              {dietPlan}
-            </div>
+            <h3 className="text-xl font-bold text-indigo-900 mb-3">
+              🍎 Your Personalized Diet Plan
+            </h3>
+            <div className="text-gray-800 leading-relaxed">{dietPlan}</div>
           </div>
         )}
       </div>
