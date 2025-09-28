@@ -2,9 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import IdentifyFood from "./IdentifyFood";
-import BodyScanner from "./BodyScanner";
 
-export default function UploadOrScanImage() {
+export default function UploadFood() {
   const [showCamera, setShowCamera] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [analysis, setAnalysis] = useState({
@@ -111,7 +110,7 @@ export default function UploadOrScanImage() {
       });
       streamRef.current = stream;
       videoRef.current.srcObject = stream;
-      videoRef.current.play();
+      videoRef.current.play().catch(err);
       setShowCamera(true);
     } catch (err) {
       console.error(err);
@@ -157,7 +156,7 @@ export default function UploadOrScanImage() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-8 w-full px-4 py-8">
       <input
         ref={fileInputRef}
         type="file"
@@ -175,12 +174,11 @@ export default function UploadOrScanImage() {
         </div>
       )}
 
-      {/* BODY SCANNER */}
       {showBodyScanner ? (
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md flex flex-col gap-4">
           <BodyScanner />
           <button
-            className="mt-4 btn btn-lg glass w-full rounded-2xl"
+            className="btn btn-lg glass w-full rounded-2xl"
             onClick={() => setShowBodyScanner(false)}
           >
             Back
@@ -212,50 +210,47 @@ export default function UploadOrScanImage() {
           </div>
         </div>
       ) : !imageUrl ? (
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-md flex justify-center">
           <button className="w-full btn btn-lg" onClick={handleUploadClick}>
             Upload Image
           </button>
-          <div className="divider text-indigo-900/60 font-medium">OR</div>
-          <button className="w-full btn btn-lg" onClick={startCamera}>
-            Scan with Camera
-          </button>
-          <button
-            className="w-full btn btn-lg mt-2"
-            onClick={() => setShowBodyScanner(true)}
-          >
-            Scan My Body
-          </button>
         </div>
       ) : (
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-md flex flex-col gap-6">
           <div className="text-center p-8 bg-white/50 backdrop-blur-sm rounded-3xl border border-white/20 shadow-lg">
-            <h3 className="text-2xl font-bold text-indigo-900 mb-4">
+            <h3 className="text-2xl font-bold text-indigo-900 mb-6">
               Analysis Results
             </h3>
+
             {imageUrl && (
               <img
                 src={imageUrl}
                 alt="Uploaded food"
-                className="w-full max-w-xs mx-auto rounded-2xl shadow-lg mb-4"
+                className="w-full max-w-xs mx-auto rounded-2xl shadow-lg mb-6"
               />
             )}
+
             {analysis && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {analysis.calories && (
                   <div className="text-3xl font-bold text-violet-600">
                     {analysis.calories} calories
                   </div>
                 )}
-                <div className="text-indigo-900/80 text-sm">
-                  {analysis.description}
+                <div className="text-indigo-900/80 text-sm leading-relaxed">
+                  {analysis.description.split("\n").map((line, index) => (
+                    <p key={index} className="mb-1">
+                      - {line}
+                    </p>
+                  ))}
                 </div>
               </div>
             )}
-            {error && <div className="text-red-600 text-sm">{error}</div>}
+
+            {error && <div className="text-red-600 text-sm mt-4">{error}</div>}
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
             <button
               className="flex-1 btn btn-outline"
               onClick={() => {
