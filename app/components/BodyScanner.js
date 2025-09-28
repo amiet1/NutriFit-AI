@@ -341,7 +341,6 @@ const BodyScanner = ({ showBodyScanner }) => {
           </div>
         )}
 
-        {/* Center: Measurements (slides left after capture) */}
         <div
           className={`flex flex-col space-y-6 bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 transition-all duration-500 ${
             isCaptured ? "xl:col-span-1" : "flex-1"
