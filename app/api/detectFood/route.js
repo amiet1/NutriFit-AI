@@ -1,9 +1,44 @@
 import OpenAI from "openai";
+import { RateLimiterMemory } from 'rate-limiter-flexible';
+
 const client = new OpenAI();
 
+// Create rate limiters
+const minuteLimiter = new RateLimiterMemory({
+  points: 10, // Number of requests
+  duration: 60, // Per 60 seconds
+});
+
+const dailyLimiter = new RateLimiterMemory({
+  points: 100, // Number of requests
+  duration: 86400, // Per day (24 hours)
+});
 
 export async function POST(request) {
   try {
+    // Get IP address from request headers
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
+
+    try {
+      // Check both rate limits
+      await Promise.all([
+        minuteLimiter.consume(ip),
+        dailyLimiter.consume(ip)
+      ]);
+    } catch (rateLimitError) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Too many requests. Please try again later.',
+          details: 'Rate limit exceeded. Maximum 10 requests per minute or 100 requests per day.'
+        }),
+        {
+          status: 429, // Too Many Requests
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     const body = await request.json();
 
     if (!body.image) {

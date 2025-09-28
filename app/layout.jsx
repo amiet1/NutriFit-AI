@@ -1,34 +1,34 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
-import NavBar from './components/NavBar'
+import "./globals.css";
+import { Inter } from "next/font/google";
+import NavBar from "./components/NavBar";
 
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 export const metadata = {
-  title: 'Calorie Calc AI | Smart Food Calorie Detection',
-  description: 'Calculate calories in your food instantly using AI. Take a photo or upload an image to get accurate calorie counts and nutritional information.',
+  title: "NutriFit AI | Smart Health Coach",
+  description: " personalized health coach",
   icons: {
     icon: [
       {
-        url: '/favicon.svg',
-        type: 'image/svg+xml',
-      }
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
     ],
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
-  manifest: '/manifest.json'
-}
+  manifest: "/manifest.json",
+};
 
 export const viewport = {
-  width: 'device-width',
+  width: "device-width",
   initialScale: 1,
-  themeColor: '#7C3AED'
-}
+  themeColor: "#7C3AED",
+};
 
 export default function RootLayout({ children }) {
   return (
@@ -40,5 +40,5 @@ export default function RootLayout({ children }) {
         </div>
       </body>
     </html>
-  )
-} 
+  );
+}
