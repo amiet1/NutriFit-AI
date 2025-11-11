@@ -22,18 +22,17 @@ AI Meal Analysis — Upload meal photos and get real-time calorie breakdowns pow
 
 Tech Stack
 
-Category
-Technologies
 Frontend
 Next.js, React, TypeScript, TailwindCSS
 AI & Vision
 OpenAI, TensorFlow.js, BodyPix
+
 Backend
 Custom API endpoints for image handling and AI inference
 Deployment
 Vercel / Cloud Hosting
 
-Role & Contributions
+**Role & Contributions**
 Project Manager & Full-Stack Developer
 
 
