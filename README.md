@@ -125,7 +125,7 @@ Personalized recommendations
 - Designed clean, modern UI using Next.js + TailwindCSS
 - Built multi-page routing for a seamless user flow
 
-🔮 Future Enhancements
+## 🔮 Future Enhancements
 
 -📱 Mobile meal scanning
 - 🔊 Voice-based meal logging
