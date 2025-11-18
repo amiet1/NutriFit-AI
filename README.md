@@ -60,31 +60,32 @@ Prerequisites
 - Webcam (for body scanning features)
 
 Installation Steps
-1. Clone the repository
+## 1. Clone the repository
 git clone <repository-url>
 cd NutriFit-AI
 
-2. Install dependencies
+## 2. Install dependencies
 npm install
 
-3. Configure environment variables
+## 3. Configure environment variables
 
 Create a .env.local file in the root directory:
 
 OPENAI_API_KEY=your-key-here
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-4. Run the development server
+## 4. Run the development server
 npm run dev
 
-5. Access the application
+## 5. Access the application
 
 Frontend: http://localhost:3000
 
 API Routes: http://localhost:3000/api/
 *
 
-📁 Project Structure
+## 📁 Project Structure
+```bash
 NutriFit-AI/
 ├── app/                        # Next.js App Router pages and routes
 │   ├── api/                    # API endpoints
