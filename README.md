@@ -98,7 +98,7 @@ NutriFit-AI/
 ├── public/                     # Static assets
 ├── styles/                     # Global styles
 └── README.md                   # Documentation
-
+```
 📦 Available Scripts
 Development
 npm run dev
