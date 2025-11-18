@@ -1,5 +1,5 @@
 NutriFit AI
-
+--------------------
 An AI-powered nutrition and fitness platform that scans meals and analyzes body composition to deliver personalized calorie counts, fitness insights, and meal recommendations.
 
 
@@ -109,56 +109,38 @@ npm start
 Linting
 npm run lint
 
-👤 Role & Contributions (Your Section)
+👤 Role & Contributions 
 
-Project Manager & Full-Stack Developer
-
-Built AI-driven nutrition analysis using OpenAI vision models
-
-Designed and implemented the full BodyScanner using TensorFlow.js + BodyPix
-
-Developed three specialized AI agents for:
-
-Meal scanning
-
-Body analysis
+-Project Manager & Full-Stack Developer
+- Built an AI-driven nutrition analysis using OpenAI vision models
+- Designed and implemented the full BodyScanner using TensorFlow.js + BodyPix
+- Developed three specialized AI agents for:
+- Meal scanning
+- Body analysis
 
 Personalized recommendations
 
-Optimized performance using caching + image resizing pipelines
-
-Designed clean, modern UI using Next.js + TailwindCSS
-
-Built multi-page routing for a seamless user flow
+- Optimized performance using caching + image resizing pipelines
+- Designed clean, modern UI using Next.js + TailwindCSS
+- Built multi-page routing for a seamless user flow
 
 🔮 Future Enhancements
 
-📱 Mobile meal scanning
-
-🔊 Voice-based meal logging
-
-🧬 Advanced nutrition profiling
-
-📈 User progress dashboards
-
-🤖 AI workout planning
-
-⌚ Integration with wearables (Apple Health, Fitbit)
-
-📚 Documentation
+-📱 Mobile meal scanning
+- 🔊 Voice-based meal logging
+- 🧬 Advanced nutrition profiling
+- 📈 User progress dashboards
+- 🤖 AI workout planning
+- ⌚ Integration with wearables (Apple Health, Fitbit)
+- 📚 Documentation
 
 Architecture Overview
 
-AI Pipeline Explanation
+- AI Pipeline Explanation
+- API Documentation
+- Component Hierarchy
 
-API Documentation
 
-Component Hierarchy
 
-(You can create a /documentation folder similar to GreenQuest if you want.)
-
-📄 License
-
-This project is licensed under the MIT License.
 
 
