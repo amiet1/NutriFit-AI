@@ -2,34 +2,28 @@ NutriFit AI
 
 An AI-powered nutrition and fitness platform that scans meals and analyzes body composition to deliver personalized calorie counts, fitness insights, and meal recommendations.
 
-🎯 Project Overview
 
 NutriFit AI is a full-stack web application designed to make healthy living easier through AI-driven nutrition and fitness analysis.
 Users can upload meal photos, scan their bodies using a webcam, track caloric intake, and receive personalized insights tailored to their goals.
 
 The platform uses a combination of OpenAI image models, TensorFlow.js BodyPix, and Next.js to create a fast, modern, and intelligent health assistant — all in the browser.
 
-🌐 Live Demo
-
-Link: Add your hosted link once deployed
-(Example: https://nutrifit-ai.vercel.app/
-)
 
 ✨ Key Features
 
-AI Meal Analysis
+- AI Meal Analysis
 Upload any meal photo and receive real-time calorie breakdowns and nutritional estimates using OpenAI’s image models.
 
-Body Scanner
+- Body Scanner
 Built with TensorFlow.js + BodyPix to estimate measurements and provide fitness ratios for personalized guidance.
 
-Personalized Recommendations
+- Personalized Recommendations
 Tailored calorie intake suggestions, macro insights, and fitness guidance based on the user's scan + meal history.
 
-Multi-Page Smart Navigation
+- Multi-Page Smart Navigation
 Separate dashboards for meals, fitness, scanning, and recommendations.
 
-Optimized Performance
+- Optimized Performance
 Intelligent caching, image preprocessing, and efficient API routing for fast responses.
 
 Modern UI/UX
@@ -38,44 +32,32 @@ Responsive, elegant design with Next.js, React, and TailwindCSS.
 🛠️ Technologies Used
 Frontend
 
-Next.js 14
-
-React 18
-
-TypeScript
-
-TailwindCSS
-
-AI & Vision
-
-OpenAI Image Models
-
-TensorFlow.js
-
-BodyPix
+- Next.js 14
+- React 18
+- TypeScript
+- TailwindCSS
+- AI & Vision
+- OpenAI Image Models
+- TensorFlow.js
+- BodyPix
 
 Backend
 
-Custom API Routes (Next.js App Router)
-
-Image processing + inference pipelines
+- Custom API Routes (Next.js App Router)
+- Image processing + inference pipelines
 
 Deployment
 
-Vercel (recommended)
-
-Cloud or custom hosting options
+- Vercel (recommended)
+- Cloud or custom hosting options
 
 🚀 Getting Started
 Prerequisites
 
-Node.js (v18 or higher)
-
-npm or yarn
-
-OpenAI API Key
-
-Webcam (for body scanning features)
+- Node.js (v18 or higher)
+- npm or yarn
+- OpenAI API Key
+- Webcam (for body scanning features)
 
 Installation Steps
 1. Clone the repository
