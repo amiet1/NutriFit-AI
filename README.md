@@ -1,85 +1,46 @@
 NutriFit AI
 
-An AI-powered nutrition and fitness platform that analyzes meals and user body composition to deliver personalized calorie counts, fitness insights, and meal recommendations.
+An AI-powered nutrition and fitness platform that scans meals and analyzes body composition to deliver personalized calorie counts, fitness insights, and meal recommendations.
 
 🎯 Project Overview
 
-NutriFit AI is a full-stack, AI-driven web application designed to simplify nutrition tracking and support healthier habits.
-Using a combination of computer vision, nutrition modeling, and body scanning, users can upload meal photos, analyze their physical measurements, and receive personalized health guidance — all inside a fast, responsive web app built with modern technologies.
+NutriFit AI is a full-stack web application designed to make healthy living easier through AI-driven nutrition and fitness analysis.
+Users can upload meal photos, scan their bodies using a webcam, track caloric intake, and receive personalized insights tailored to their goals.
 
-NutriFit AI combines:
+The platform uses a combination of OpenAI image models, TensorFlow.js BodyPix, and Next.js to create a fast, modern, and intelligent health assistant — all in the browser.
 
-AI meal recognition
+🌐 Live Demo
 
-Body measurement scanning
-
-Personalized insights
-
-A seamless, multi-page UX
-
-…to help users make smarter, data-driven decisions about their health.
+Link: Add your hosted link once deployed
+(Example: https://nutrifit-ai.vercel.app/
+)
 
 ✨ Key Features
-🍽️ AI Meal Analysis
 
-Upload meal photos and get real-time calorie breakdowns using OpenAI’s multimodal models and custom preprocessing.
+AI Meal Analysis
+Upload any meal photo and receive real-time calorie breakdowns and nutritional estimates using OpenAI’s image models.
 
-📸 Body Scanner
+Body Scanner
+Built with TensorFlow.js + BodyPix to estimate measurements and provide fitness ratios for personalized guidance.
 
-Uses TensorFlow.js + BodyPix to analyze body shape, estimate measurements, and generate fitness recommendations directly in the browser.
+Personalized Recommendations
+Tailored calorie intake suggestions, macro insights, and fitness guidance based on the user's scan + meal history.
 
-💡 Personalized Recommendations
+Multi-Page Smart Navigation
+Separate dashboards for meals, fitness, scanning, and recommendations.
 
-AI agents generate tailored nutrition and fitness insights based on:
+Optimized Performance
+Intelligent caching, image preprocessing, and efficient API routing for fast responses.
 
-Scanner results
-
-Meal history
-
-General dietary goals
-
-🔀 Smart Page Routing
-
-Clean, structured multi-page interface for:
-
-Meal scanning
-
-Fitness guidance
-
-Body analysis
-
-Personalized insights
-
-⚡ Optimized Performance
-
-Local image preprocessing
-
-Caching logic
-
-Image resizing pipelines
-
-Faster calls to OpenAI APIs
-
-🎨 Modern UI/UX
-
-Built with:
-
-Next.js
-
-React
-
-TypeScript
-
-TailwindCSS
-
-Responsive, minimal, and consistent across devices.
+Modern UI/UX
+Responsive, elegant design with Next.js, React, and TailwindCSS.
 
 🛠️ Technologies Used
 Frontend
 
-Next.js
+Next.js 14
 
-React
+React 18
 
 TypeScript
 
@@ -87,7 +48,7 @@ TailwindCSS
 
 AI & Vision
 
-OpenAI (image + text models)
+OpenAI Image Models
 
 TensorFlow.js
 
@@ -95,93 +56,127 @@ BodyPix
 
 Backend
 
-Custom API routes
+Custom API Routes (Next.js App Router)
 
-Image preprocessing + AI inference endpoints
+Image processing + inference pipelines
 
 Deployment
 
 Vercel (recommended)
 
-Cloud Hosting (optional)
-
-🧩 Role & Contributions
-
-Project Manager & Full-Stack Developer
-
-Designed and built the AI-powered nutrition system using OpenAI for calorie analysis.
-
-Developed the BodyScanner component using TensorFlow.js/BodyPix for body measurement analysis.
-
-Built three specialized AI agents for scanning, analysis, and personalized recommendations.
-
-Improved speed and accuracy with image optimization + caching pipelines.
-
-Architected multi-page routing and organized app structure for intuitive navigation.
-
-Designed a polished UI using React, Next.js, and TailwindCSS.
+Cloud or custom hosting options
 
 🚀 Getting Started
 Prerequisites
 
-Node.js (v16+)
+Node.js (v18 or higher)
 
 npm or yarn
 
-Installation
+OpenAI API Key
 
-Clone the repository:
+Webcam (for body scanning features)
 
+Installation Steps
+1. Clone the repository
 git clone <repository-url>
-cd nutrifit-ai
+cd NutriFit-AI
 
-
-Install dependencies:
-
+2. Install dependencies
 npm install
 
+3. Configure environment variables
 
-Set up environment variables:
+Create a .env.local file in the root directory:
 
-Create a .env.local file:
+OPENAI_API_KEY=your-key-here
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-OPENAI_API_KEY=your-key
-NEXT_PUBLIC_TF_ENABLE=1
-
-
-Run the development server:
-
+4. Run the development server
 npm run dev
 
+5. Access the application
 
-Access the app:
+Frontend: http://localhost:3000
 
-http://localhost:3000
+API Routes: http://localhost:3000/api/
+*
 
 📁 Project Structure
-NutriFitAI/
-├── app/                     # Next.js app router pages
-├── components/              # Reusable UI components
-├── lib/                     # Utility functions
-├── pages/api/               # Backend API routes
-├── public/                  # Static assets
-└── styles/                  # Global styles
+NutriFit-AI/
+├── app/                        # Next.js App Router pages and routes
+│   ├── api/                    # API endpoints
+│   ├── scan/                   # Body scanner page
+│   ├── meals/                  # Meal analysis page
+│   ├── recommendations/        # AI recommendations page
+│   └── layout.tsx              # Root layout
+├── components/                 # Reusable UI components
+├── lib/                        # Utility functions, AI logic
+├── public/                     # Static assets
+├── styles/                     # Global styles
+└── README.md                   # Documentation
+
+📦 Available Scripts
+Development
+npm run dev
+
+Production Build
+npm run build
+npm start
+
+Linting
+npm run lint
+
+👤 Role & Contributions (Your Section)
+
+Project Manager & Full-Stack Developer
+
+Built AI-driven nutrition analysis using OpenAI vision models
+
+Designed and implemented the full BodyScanner using TensorFlow.js + BodyPix
+
+Developed three specialized AI agents for:
+
+Meal scanning
+
+Body analysis
+
+Personalized recommendations
+
+Optimized performance using caching + image resizing pipelines
+
+Designed clean, modern UI using Next.js + TailwindCSS
+
+Built multi-page routing for a seamless user flow
 
 🔮 Future Enhancements
 
-📱 Mobile camera scanning support
+📱 Mobile meal scanning
 
 🔊 Voice-based meal logging
 
-🧬 Advanced nutrition profiling with meal history AI
+🧬 Advanced nutrition profiling
 
-🥗 Integrations (Apple Health, Fitbit, Garmin)
+📈 User progress dashboards
 
-📊 Personalized progress dashboards
+🤖 AI workout planning
 
-📝 License
+⌚ Integration with wearables (Apple Health, Fitbit)
+
+📚 Documentation
+
+Architecture Overview
+
+AI Pipeline Explanation
+
+API Documentation
+
+Component Hierarchy
+
+(You can create a /documentation folder similar to GreenQuest if you want.)
+
+📄 License
 
 This project is licensed under the MIT License.
-
 
 
